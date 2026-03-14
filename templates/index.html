@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pitch Visualizer</title>
+
+<style>
+
+body{
+font-family: Arial;
+margin:40px;
+background:#f5f5f5;
+}
+
+textarea{
+width:600px;
+height:120px;
+padding:10px;
+font-size:16px;
+}
+
+button{
+padding:10px 20px;
+font-size:16px;
+margin-top:10px;
+}
+
+.storyboard{
+margin-top:40px;
+display:grid;
+grid-template-columns:repeat(2, 1fr);
+gap:20px;
+}
+
+.panel{
+background:white;
+padding:10px;
+border-radius:8px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.panel img{
+width:100%;
+border-radius:6px;
+}
+
+.caption{
+margin-top:10px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Pitch Visualizer</h1>
+
+<p>Paste a short narrative and generate a visual storyboard.</p>
+
+<form method="post" action="/generate">
+
+<textarea name="text" placeholder="Paste your narrative here..."></textarea>
+
+<br><br>
+
+<label>Select visual style:</label>
+
+<select name="style">
+    <option value="cinematic digital illustration">Cinematic</option>
+    <option value="comic book illustration">Comic Book</option>
+    <option value="watercolor painting">Watercolor</option>
+    <option value="photorealistic">Photorealistic</option>
+</select>
+
+<br><br>
+
+<button type="submit">Generate Storyboard</button>
+
+</form>
+{% if storyboard %}
+
+<h2>Storyboard</h2>
+
+<div class="storyboard">
+
+{% for panel in storyboard %}
+
+<div class="panel">
+
+<img src="/{{panel.image}}">
+
+<div class="caption">
+{{panel.caption}}
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endif %}
+
+</body>
+</html>
