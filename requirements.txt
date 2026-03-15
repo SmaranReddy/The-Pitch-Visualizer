@@ -11,3 +11,11 @@ requests
 pillow
 
 python-dotenv
+
+diffusers 
+transformers 
+accelerate 
+safetensors 
+torch
+
+huggingface_hub
