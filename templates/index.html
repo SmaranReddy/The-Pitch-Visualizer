@@ -8,6 +8,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 
 *{
@@ -23,8 +25,6 @@ color:white;
 min-height:100vh;
 overflow-x:hidden;
 }
-
-/* glowing background blobs */
 
 body::before,
 body::after{
@@ -55,8 +55,6 @@ margin:auto;
 padding:60px 20px;
 }
 
-/* TITLE */
-
 h1{
 font-size:56px;
 font-weight:700;
@@ -73,8 +71,6 @@ margin-bottom:40px;
 font-size:18px;
 }
 
-/* CARD */
-
 .input-card{
 background:rgba(255,255,255,0.05);
 backdrop-filter:blur(14px);
@@ -83,8 +79,6 @@ padding:35px;
 box-shadow:0 15px 40px rgba(0,0,0,0.5);
 border:1px solid rgba(255,255,255,0.08);
 }
-
-/* TEXTAREA */
 
 textarea{
 width:100%;
@@ -96,20 +90,7 @@ font-size:16px;
 background:#020617;
 color:white;
 resize:none;
-transition:0.3s;
 }
-
-textarea:focus{
-outline:none;
-border:1px solid #6366f1;
-box-shadow:0 0 10px #6366f180;
-}
-
-textarea::placeholder{
-color:#94a3b8;
-}
-
-/* CONTROLS */
 
 .controls{
 margin-top:20px;
@@ -126,10 +107,7 @@ border-radius:10px;
 border:1px solid rgba(255,255,255,0.1);
 background:#020617;
 color:white;
-font-size:14px;
 }
-
-/* BUTTON */
 
 button{
 background:linear-gradient(90deg,#6366f1,#8b5cf6);
@@ -138,18 +116,13 @@ border:none;
 padding:14px 28px;
 border-radius:10px;
 font-size:16px;
-font-weight:500;
 cursor:pointer;
 transition:0.3s;
-box-shadow:0 8px 25px rgba(99,102,241,0.5);
 }
 
 button:hover{
 transform:translateY(-3px);
-box-shadow:0 15px 35px rgba(99,102,241,0.7);
 }
-
-/* STORYBOOK VIEWER */
 
 .storyboard-viewer{
 margin-top:60px;
@@ -158,15 +131,12 @@ flex-direction:column;
 align-items:center;
 }
 
-/* PANEL */
-
 .panel{
 background:rgba(255,255,255,0.05);
 border-radius:16px;
 overflow:hidden;
 box-shadow:0 15px 30px rgba(0,0,0,0.4);
 border:1px solid rgba(255,255,255,0.08);
-transition:0.4s;
 max-width:720px;
 width:100%;
 display:none;
@@ -174,34 +144,14 @@ display:none;
 
 .panel.active{
 display:block;
-animation:fadeIn 0.5s ease;
 }
-
-.panel:hover{
-transform:translateY(-8px);
-box-shadow:0 25px 50px rgba(0,0,0,0.6);
-}
-
-/* IMAGE */
 
 .panel img{
 width:100%;
-display:block;
-transition:0.5s;
 }
-
-.panel:hover img{
-transform:scale(1.05);
-}
-
-/* CAPTION */
 
 .caption{
 padding:18px;
-font-weight:500;
-font-size:15px;
-line-height:1.4;
-opacity:0.9;
 }
 
 .panel-number{
@@ -210,15 +160,12 @@ font-size:13px;
 margin-bottom:5px;
 }
 
-/* NAVIGATION */
-
 .slide-controls{
 margin-top:25px;
 display:flex;
 gap:20px;
+flex-wrap:wrap;
 }
-
-/* LOADING ANIMATION */
 
 .loader{
 display:none;
@@ -237,20 +184,7 @@ margin:auto;
 }
 
 @keyframes spin{
-to{
-transform:rotate(360deg);
-}
-}
-
-@keyframes fadeIn{
-from{
-opacity:0;
-transform:translateY(20px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
+to{transform:rotate(360deg);}
 }
 
 </style>
@@ -317,7 +251,12 @@ transform:translateY(0);
 <div class="slide-controls">
 
 <button id="prevBtn" onclick="prevSlide()">Previous</button>
+
+<button id="playBtn" onclick="togglePlayback()">Play ▶</button>
+
 <button id="nextBtn" onclick="nextSlide()">Next</button>
+
+<button onclick="downloadPDF()">Download as PDF 📄</button>
 
 </div>
 
@@ -331,9 +270,9 @@ function showLoader(){
 document.getElementById("loader").style.display="block";
 }
 
-/* Story slide navigation */
-
 let currentSlide = 0
+let autoplay = false
+let interval
 
 function getSlides(){
 return document.querySelectorAll(".slide")
@@ -346,20 +285,16 @@ const slides = getSlides()
 const prevBtn = document.getElementById("prevBtn")
 const nextBtn = document.getElementById("nextBtn")
 
-if(!prevBtn || !nextBtn) return
-
-// Hide previous button on first slide
 if(currentSlide === 0){
-prevBtn.style.display = "none"
+prevBtn.style.display="none"
 }else{
-prevBtn.style.display = "inline-block"
+prevBtn.style.display="inline-block"
 }
 
-// Hide next button on last slide
-if(currentSlide === slides.length - 1){
-nextBtn.style.display = "none"
+if(currentSlide === slides.length-1){
+nextBtn.style.display="none"
 }else{
-nextBtn.style.display = "inline-block"
+nextBtn.style.display="inline-block"
 }
 
 }
@@ -368,9 +303,7 @@ function showSlide(index){
 
 const slides = getSlides()
 
-if(slides.length === 0) return
-
-slides.forEach(slide => slide.classList.remove("active"))
+slides.forEach(slide=>slide.classList.remove("active"))
 
 slides[index].classList.add("active")
 
@@ -382,29 +315,81 @@ function nextSlide(){
 
 const slides = getSlides()
 
-if(slides.length === 0) return
-
-if(currentSlide < slides.length - 1){
+if(currentSlide < slides.length-1){
 currentSlide++
 showSlide(currentSlide)
+}else{
+stopPlayback()
 }
 
 }
 
 function prevSlide(){
 
-const slides = getSlides()
-
-if(slides.length === 0) return
-
-if(currentSlide > 0){
+if(currentSlide>0){
 currentSlide--
 showSlide(currentSlide)
 }
 
 }
 
-/* Keyboard navigation */
+function togglePlayback(){
+
+const playBtn=document.getElementById("playBtn")
+
+if(!autoplay){
+
+autoplay=true
+playBtn.innerText="Pause ⏸"
+
+interval=setInterval(()=>{
+nextSlide()
+},2000)
+
+}else{
+
+stopPlayback()
+
+}
+
+}
+
+function stopPlayback(){
+
+const playBtn=document.getElementById("playBtn")
+
+autoplay=false
+clearInterval(interval)
+
+playBtn.innerText="Play ▶"
+
+}
+
+async function downloadPDF(){
+
+const { jsPDF } = window.jspdf
+
+const slides=getSlides()
+
+const pdf=new jsPDF()
+
+for(let i=0;i<slides.length;i++){
+
+const img=slides[i].querySelector("img")
+const caption=slides[i].querySelector(".caption").innerText
+
+if(i>0) pdf.addPage()
+
+pdf.addImage(img.src,"PNG",10,20,190,100)
+
+pdf.setFontSize(12)
+pdf.text(caption,10,140)
+
+}
+
+pdf.save("storyboard.pdf")
+
+}
 
 document.addEventListener("keydown",function(e){
 
@@ -418,17 +403,12 @@ prevSlide()
 
 })
 
-/* Initialize slider */
-
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded",function(){
 showSlide(currentSlide)
 })
 
-/* Hide loader after page loads */
-
-window.addEventListener("load", function(){
-const loader = document.getElementById("loader")
-if(loader) loader.style.display="none"
+window.addEventListener("load",function(){
+document.getElementById("loader").style.display="none"
 })
 
 </script>
