@@ -8,6 +8,14 @@ This project demonstrates how **large language models and generative image model
 
 ---
 
+# Repository
+
+GitHub Repository:
+
+https://github.com/SmaranReddy/The-Pitch-Visualizer
+
+---
+
 # Key Features
 
 ## Narrative to Storyboard Generation
@@ -39,6 +47,21 @@ The storyboard viewer supports:
 - Previous / Next navigation
 - Keyboard arrow navigation
 - Automatic slideshow playback
+
+## Export Storyboard
+The application includes a **Download as PDF** feature that allows users to export the generated storyboard as a single PDF document.
+
+The PDF contains:
+
+- All storyboard panels
+- Scene captions
+- Ordered narrative visualization
+
+This makes the tool useful for:
+
+- Startup pitch presentations
+- Storyboarding for films or animations
+- Visual storytelling documentation
 
 ---
 
@@ -98,7 +121,8 @@ README.md
 # Technology Stack
 
 ## Backend
-**FastAPI**
+
+FastAPI
 
 A lightweight Python framework used to handle API requests and orchestrate the AI pipeline.
 
@@ -123,22 +147,22 @@ Used for **narrative analysis and scene extraction**.
 Used to **generate visual images from prompts**.
 
 ### Pollinations AI
-A **fallback provider** used if the primary image generation provider fails.
+Used as a **fallback image provider** if the primary provider fails.
 
 ---
 
 # Installation
 
-## 1. Clone the Repository
+## 1 Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/ai-pitch-visualizer.git
-cd ai-pitch-visualizer
+git clone https://github.com/SmaranReddy/The-Pitch-Visualizer.git
+cd The-Pitch-Visualizer
 ```
 
 ---
 
-## 2. Create Virtual Environment
+## 2 Create Virtual Environment
 
 ```bash
 python -m venv .venv
@@ -160,7 +184,7 @@ source .venv/bin/activate
 
 ---
 
-## 3. Install Dependencies
+## 3 Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -168,22 +192,20 @@ pip install -r requirements.txt
 
 ---
 
-# API Configuration
+# Environment Variables
 
 Create a `.env` file in the root directory.
 
 Example:
 
 ```
-GEMINI_API_KEY=your_gemini_api_key
-HUGGINGFACE_API_TOKEN=your_huggingface_token
+GEMINI_API_KEY=''
+HUGGINGFACE_API_TOKEN=''
+POLLINATION_API=''
 ```
 
----
-
-## Gemini API
-
-Used for **scene planning**.
+### Gemini API Key
+Used for **scene planning and narrative analysis**.
 
 Get an API key from:
 
@@ -191,13 +213,17 @@ https://aistudio.google.com
 
 ---
 
-## HuggingFace Token
-
+### HuggingFace API Token
 Used for **FLUX image generation**.
 
-Generate a token at:
+Create a token at:
 
 https://huggingface.co/settings/tokens
+
+---
+
+### Pollinations API
+Used as a **fallback image generation provider** if the primary FLUX provider fails.
 
 ---
 
@@ -209,7 +235,7 @@ Start the FastAPI server:
 uvicorn app.main:app --reload
 ```
 
-Open in your browser:
+Open the application in your browser:
 
 ```
 http://127.0.0.1:8000
@@ -220,20 +246,22 @@ http://127.0.0.1:8000
 # Example Input
 
 ```
-A programmer drinks coffee while coding late at night.
-The screen suddenly fills with red error messages.
-He looks shocked staring at the laptop.
-After debugging, the code finally works and he celebrates.
+A massive spaceship slowly descends onto a distant alien planet.
+Astronauts step out wearing futuristic suits and explore the glowing landscape.
+Strange floating creatures drift through the air around them.
+Suddenly a colossal alien structure rises from beneath the planet’s surface.
 ```
 
-Generated storyboard panels:
+### Generated Storyboard Panels
 
-1. Programmer drinking coffee while coding  
-2. Laptop screen filled with error messages  
-3. Programmer shocked staring at screen  
-4. Programmer celebrating successful code  
+The system converts the narrative into scenes such as:
 
-Each scene is visualized using **AI-generated images**.
+1. Massive spaceship descending onto an alien planet  
+2. Astronauts exploring the glowing alien landscape  
+3. Strange floating creatures drifting through the air  
+4. A colossal alien structure emerging from the planet surface  
+
+Each scene is visualized as an **AI-generated storyboard panel**, forming a visual narrative of the story.
 
 ---
 
@@ -250,22 +278,26 @@ character + camera shot + scene description + style + cinematic cues
 Example prompt:
 
 ```
-young programmer, close-up shot, shocked staring at laptop screen,
+young astronaut, wide shot, exploring glowing alien landscape,
 cinematic lighting, storyboard frame
 ```
 
 ### Design Principles
 
-#### Short Prompts
+**Short Prompts**
+
 Diffusion models perform better with concise prompts.
 
-#### Visual Keywords
+**Visual Keywords**
+
 Comma-separated visual descriptors improve model interpretation.
 
-#### Consistent Subject
+**Consistent Subject**
+
 The main character is included in prompts to maintain visual continuity.
 
-#### Cinematic Framing
+**Cinematic Framing**
+
 Camera shots such as:
 
 - wide shot
@@ -306,7 +338,7 @@ Pollinations (Fallback Provider)
         └── Failure → fallback image
 ```
 
-This ensures that the storyboard generation pipeline continues to function **even if the primary provider fails**.
+This ensures that storyboard generation continues **even if the primary provider fails**.
 
 ---
 
@@ -334,13 +366,13 @@ The UI is intentionally simple to keep focus on the **AI pipeline**.
 
 # Limitations
 
-## Character Consistency
+### Character Consistency
 Diffusion models may generate slightly different character appearances across panels.
 
-## Scene Interpretation
+### Scene Interpretation
 Language models may occasionally generate scenes that lack strong visual cues.
 
-## External API Dependence
+### External API Dependence
 Image generation relies on third-party APIs, which may have usage limits.
 
 ---
@@ -352,7 +384,7 @@ Possible extensions for the system include:
 - Character identity consistency across panels
 - Multi-character scene detection
 - Editable scene descriptions
-- Storyboard PDF export
+- Storyboard PDF export improvements
 - Animated transitions between panels
 - Additional artistic styles
 - Scene timeline view
